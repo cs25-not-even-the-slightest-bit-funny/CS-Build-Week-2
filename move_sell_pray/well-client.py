@@ -27,23 +27,13 @@ def cooldown_func(response):
     for i in range(0, cooldown_rounded_up):
         print(f'Remaining cooldown new move: {cooldown_rounded_up - i})', end="\r")
         time.sleep(1)
-
-def cooldown_func_snitch(response, snitch_room):
-    cooldown = response["cooldown"]
-    cooldown_rounded_up = math.ceil(cooldown)
-    for i in range(0, cooldown_rounded_up):
-        f = open("snitch_room.txt","r+")
-        snitch_room_copy = int(f.readline())
-        f.close()
-        if snitch_room != snitch_room_copy:
-            break
-        print(f'Remaining cooldown new move: {cooldown_rounded_up - i})', end="\r")
-        time.sleep(1)        
-        
-        
-# curl -X POST -H 'Authorization: Token b9ac3ccda7673a719af4c4305ec9efacdef4c161' -H "Content-Type: application/json" -d '{"name":"nice jacket"}' https://lambda-treasure-hunt.herokuapp.com/api/adv/take/
-# curl -X POST -H 'Authorization: Token 6a879ef0d8d6851f96f1d1144cd3836007c07225' -H "Content-Type: application/json" https://lambda-treasure-hunt.herokuapp.com/api/adv/status/
+# curl -X POST -H 'Authorization: Token b9ac3ccda7673a719af4c4305ec9efacdef4c161' -H "Content-Type: application/json" -d '{"name":"tiny treasure"}' https://lambda-treasure-hunt.herokuapp.com/api/adv/drop/
+# curl -X POST -H 'Authorization: Token b9ac3ccda7673a719af4c4305ec9efacdef4c161' -H "Content-Type: application/json" https://lambda-treasure-hunt.herokuapp.com/api/adv/status/
+<<<<<<< HEAD:move_sell_pray/wrapped.py
 token = 'Token b9ac3ccda7673a719af4c4305ec9efacdef4c161' #6a879ef0d8d6851f96f1d1144cd3836007c07225
+=======
+token = 'Token 474a89c17aebf1820255565c58db9f9b2e2893f1' #6a879ef0d8d6851f96f1d1144cd3836007c07225
+>>>>>>> 02f8fdb04ec09644be84d180ae36534e0ba3b751:move_sell_pray/well-client.py
 url = 'https://lambda-treasure-hunt.herokuapp.com'
 headers = {
     'Authorization': token,
@@ -216,133 +206,77 @@ def go_to_pirate(curr_id, pyrate=467, come_back=False):
     print("NAME CHANGED ============= Let's Mine!!!\n")
     curr_id = next_room['room_id']
     return pyrate
-    
+shrined = [0,0,0]
 def go_to_shrine(curr_id, shrine=[374,461,22]):
     for ind in range(len(shrined)):
         print(shrined)
         if shrined[ind] == 0:
             sh = shrine[ind]
-            
-    traversal_path = g.bfs(curr_id, sh)
+        else:
+            continue
+    # traversal_path = g.bfs(curr_id, sh)
     
-    i = 0
-    temp_list = []
-    while i + 1 < len(traversal_path):
-        print(traversal_path[i])
-        direction = path_reverse[traversal_path[i]][traversal_path[i+1]]
-        data = '{"direction":"' + direction + '", "next_room_id":"' + str(traversal_path[i+1]) + '"}'
-        reverse_data = '{"direction":"' + reverse[direction] + '", "next_room_id":"' + str(traversal_path[i]) + '"}'
-        temp_list.insert(0,reverse_data)
-        next_room = requests.post(url + '/api/adv/fly/', headers=headers, data=data).json()
-        i +=1
-        cooldown_func(next_room)
-    response_shrine = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/pray/', 
-                                                headers=headers).json()
-    print('=========Shrined!=================\n')
-    cooldown_func(response_shrine)
-    shrined[ind] = 1
-    print(shrined)
-    print(response_shrine)
-    curr_id = next_room['room_id']
+        dash_fly(curr_id, sh)
+        response_shrine = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/pray/', 
+                                                    headers=headers).json()
+        print('=========Shrined!=================\n')
+        cooldown_func(response_shrine)
+        shrined[ind] = 1
+        print(shrined)
+        print(response_shrine)
+        curr_id = response_shrine['room_id']
     return curr_id
 import itertools
 def dash_fly(curr_id,destination):
-    f = open("snitch_room.txt","r+")
-    snitch_room = int(f.readline())
-    f.close()
-    print(snitch_room)
-    # snitch_room_copy = int(snitch_room)
-    while True:
-        f = open("snitch_room.txt","r+")
-        # snitch_room_copy = f.readline()
-        try:
-            snitch_room_copy = int(f.readline())
-            f.close()
-        except:
-            continue
-        if snitch_room == snitch_room_copy:
-            continue
-      
-        
-        traversal_path = g.bfs(curr_id, snitch_room_copy)
-        i = 0
-        ids = []
-        directions = []
-        print(len(traversal_path))
-        print(f'traversal_path: {traversal_path}')
-        while i + 1 < len(traversal_path):
-            # print(traversal_path[i])
-            direction = path_reverse[traversal_path[i]][traversal_path[i+1]]
-            directions.append(direction)
-            ids.append(traversal_path[i+1])
-            i += 1
-        print(len(ids))
-        print(len(directions))
-        print('Getting listy')
-        listy = [list(v) for g,v in itertools.groupby(directions)]
-        print(ids)
-        print(listy)
-        temp_length = 0
-        counter = 0
-        if len(listy) >= 4:
-            print('==== NO GO =====')
-            f = open("snitch_room.txt","r+")
-            snitch_room = int(f.readline())
-            f.close()
-            continue
-        for i in range(len(listy)):
-            f = open("snitch_room.txt","r+")
-            snitch_room = int(f.readline())
-            f.close()
-            if snitch_room_copy != snitch_room:
-                break
-            length = len(listy[i])
-            temp_length += length
-            # print(ids[counter:temp_length])
-            ids_str = str(ids[counter:temp_length]).strip('[]').replace(" ", "")
-            # print(ids_str)
-            direction = listy[i][0]
-            print(directions)
-            print(direction)
-            print(ids_str)
-            num_rooms = str(len(ids[counter:temp_length]))
-            counter = temp_length
-            if length > 1:
-                print('DASHING')
-                dash_data = '{"direction":"'+ direction +'", "num_rooms":"' + num_rooms + '", "next_room_ids":"' + str(ids_str) + '"}'
-                print(dash_data)
-                next_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/dash/', 
-                            headers=headers, data=dash_data).json()
-                print(next_room)
-                cooldown_func(next_room)
-                curr_id = next_room['room_id']
-                print(f"room: {next_room['room_id']}")
-                
-            else:
-                print('FLYING')
-                fly_data = '{"direction":"' + direction + '", "next_room_id":"' + ids_str + '"}'
-                next_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/fly/', 
-                                    headers=headers, data=fly_data).json()
-                cooldown_func(next_room)
-                print(f"room: {next_room['room_id']}")
-                # cooldown_func(next_room)
-                curr_id = next_room['room_id']
-                
-        f = open("snitch_room.txt","r+")
-        snitch_room = int(f.readline())
-        f.close()
-        if snitch_room_copy != snitch_room:
-            continue
+    traversal_path = g.bfs(curr_id, destination)
+    i = 0
+    ids = []
+    directions = []
+    print(len(traversal_path))
+    print(f'traversal_path: {traversal_path}')
+    while i + 1 < len(traversal_path):
+        # print(traversal_path[i])
+        direction = path_reverse[traversal_path[i]][traversal_path[i+1]]
+        directions.append(direction)
+        ids.append(traversal_path[i+1])
+        i += 1
+    print(len(ids))
+    print(len(directions))
+    print('Getting listy')
+    listy = [list(v) for g,v in itertools.groupby(directions)]
+    print(ids)
+    print(listy)
+    temp_length = 0
+    counter = 0
+    for i in range(len(listy)):
+        length = len(listy[i])
+        temp_length += length
+        # print(ids[counter:temp_length])
+        ids_str = str(ids[counter:temp_length]).strip('[]').replace(" ", "")
+        # print(ids_str)
+        direction = listy[i][0]
+        print(directions)
+        print(direction)
+        print(ids_str)
+        num_rooms = str(len(ids[counter:temp_length]))
+        counter = temp_length
+        if length > 1:
+            print('DASHING')
+            dash_data = '{"direction":"'+ direction +'", "num_rooms":"' + num_rooms + '", "next_room_ids":"' + str(ids_str) + '"}'
+            print(dash_data)
+            next_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/dash/', 
+                          headers=headers, data=dash_data).json()
+            print(next_room)
+            print(f"room: {next_room['room_id']}")
+            cooldown_func(next_room)
         else:
-            
-            data = '{"name":"golden snitch"}'
-            take_snitch = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', 
-                                                headers=headers, data=data).json()
-            print(take_snitch)
-            print('=============== Took SNITCH! ===============\n'
-                '++++++++++++++++++++++++++++++++++++++++++++++')
-            cooldown_func(take_snitch)
-            
+            print('FLYING')
+            fly_data = '{"direction":"' + direction + '", "next_room_id":"' + ids_str + '"}'
+            next_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/fly/', 
+                                headers=headers, data=fly_data).json()
+            print(f"room: {next_room['room_id']}")
+            cooldown_func(next_room)
+        
     return destination
 
 
@@ -370,24 +304,14 @@ def go_to_wishing_well_snitch(curr_id, wishing_well=55, alternative=False):
         ls8.load(filename)
         snitch_room = ls8.run()
         snitch_room = int(snitch_room.replace(" ",""))
+        # snitch_room_copy = int(snitch_room)
         if snitch_room_copy == snitch_room:
             continue
         f = open("snitch_room.txt","w")
         f.write(str(snitch_room))
         f.close()
         snitch_room_copy = int(snitch_room)
-        print('=================== Going to to get snitch ===================')
-        snitch_room = dash_fly(curr_id_1, snitch_room, headers=headers)
         
-        data = '{"name":"golden snitch"}'
-                        
-        take_snitch = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/take/', 
-                                                headers=headers, data=data).json()
-
-
-        # cooldown_func(take_snitch)
-        print('================ snitch grabbed ===============')
-        print(take_snitch)
            
            
     return snitch_room
@@ -483,20 +407,65 @@ def warp():
     response = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/warp/', headers=headers).json()
     cooldown_func(response)
     print(response)
+    # while True:
+    #     cmds = input("-> ").lower().split(" ")
+    #     if cmds[0] in ["n", "s", "e", "w"]:
+    #         # player.travel(cmds[0], True)
+    #         data = '{"direction":"' + str(cmds[0]) +'"}'
+            
+    #         next_room = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/fly/', 
+    #                                   headers=headers, data=data).json()
+    #         cooldown_func(next_room)
+    #         print(next_room)
+    #     elif cmds[0] in ["examine", "take"]:
+    #         if len(cmds[1:]) > 1:
+    #             t = cmds[1] + " " +cmds[2]
+    #         else:
+    #             t = cmds[1]
+                
+    #         data = '{"name":"' + str(t) +'"}'
+            
+    #         take_examin = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/'+cmds[0]+'/', 
+    #                                   headers=headers, data=data).json()
+    #         cooldown_func(take_examin)
+        
+    #         print(take_examin)
+        
+    #     elif cmds[0] == "mine":
+            
+    #         message = proof_of_work(headers)
+    #         print(f'Mining message: {message}')
+    #         mine_response = requests.get('https://lambda-treasure-hunt.herokuapp.com/api/bc/get_balance/', 
+    #                                     headers=headers).json()
 
-def grab_snitch(curr_id):
-    print('=================== Going to to get snitch ===================')
-    f = open("snitch_room.txt","r+")
-    snitch_room = int(f.readline())
-    f.close()
-    print(snitch_room)
-    snitch_room = dash_fly(curr_id, snitch_room)
+    #         print('================ Mined new coin ===============')
+    #         print(mine_response)
+    #         cooldown_func(mine_response)
+        
+    #     elif cmds[0] == 'pray':
+    #         data_items = '{"name":"Wishing Well"}'
+    #         response_examin = requests.post('https://lambda-treasure-hunt.herokuapp.com/api/adv/examine/', 
+    #                                                         headers=headers, data=data_items).json()
+    #         well_desc = response_examin['description'].split('\n')
+    #         print(f'well_desc: {well_desc}')
+    #         # code = response['description']
+    #         filename = 'wishing_well.txt'
+    #         well_desc.pop()
+    #         well_desc.append('00010011')
+    #         with open(filename, 'w') as f:
+    #             for line in well_desc[2:]:
+    #                 f.write(line)
+    #                 f.write('\n')
+    #         print('=================== DECODING MESSAGE ====================')
+    #         ls8 = CPU()
+    #         ls8.load(filename)
+    #         mine_room = ls8.run()
+    #         mine_room = int(mine_room.replace(" ",""))
+    #         print(mine_room)
+            
+    #     elif cmds[0] == "q":
+    #         break
 
-
-
-    # cooldown_func(take_snitch)
-    print('================ snitch grabbed ===============')
-    print(take_snitch)
 
 def find_new_move_room(visited, current_room, curr_id, encumbrance, 
                        strength, inventory, gold, armor, shoes, name, 
@@ -511,17 +480,17 @@ def find_new_move_room(visited, current_room, curr_id, encumbrance,
     #     new_id = go_to_wishing_well_mine(curr_id)
     
     if wrapped == False:
-        print('========================= Getting that snitch ==================')
         warp()
         wrapped = True
-        # grab_snitch(curr_id)
-        
-
+    # Wishing Well
     
     elif wrapped == True:
+        curr_id = go_to_shrine(curr_id)
         print('========================= Getting that snitch ==================')
-        # curr_id = dash_fly(curr_id, wishing_well)
-        grab_snitch(curr_id)
+        curr_id = dash_fly(curr_id, 555)
+        while True:
+            curr_id = go_to_wishing_well_snitch(curr_id, wishing_well=555)
+    
         
     if curr_id not in visited:
         for direction in ['n','s','w','e']:
